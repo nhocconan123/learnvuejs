@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card" :class="{ disabled: isDisaled }">
     <div
       class="card__inner"
       :class="{ 'is-flipped': isFlipped }"
@@ -23,7 +23,10 @@
 <script>
 export default {
   props: {
-    TestCard: { type: [Array, String, Number, Object] },
+    testCard: {
+      type: Object,
+      required: true,
+    },
     imgBackFaceUrl: {
       type: String,
       required: true,
@@ -34,22 +37,24 @@ export default {
         return [];
       },
     },
-    rules: {
-      type: Array,
-    },
   },
   data() {
     return {
+      isDisaled: false,
       isFlipped: false,
     };
   },
   methods: {
     onToggleFlipCard() {
+      if (this.isDisaled) return false;
       this.isFlipped = !this.isFlipped;
-      if (this.isFlipped) this.$emit("onFlip", this.TestCard);
+      if (this.isFlipped) this.$emit("onFlip", this.testCard);
     },
     onFlipBackCard() {
       this.isFlipped = false;
+    },
+    onEnableDisableMode() {
+      this.isDisaled = true;
     },
   },
 };
@@ -100,5 +105,8 @@ export default {
   background-repeat: no-repeat;
   height: 100%;
   width: 100%;
+}
+.card.disabled .card__inner {
+  cursor: default;
 }
 </style>

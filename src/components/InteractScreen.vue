@@ -1,17 +1,19 @@
 <template>
   <div class="scre">
-    <h1>Interact Component here ...</h1>
+    <!-- <h1>Interact Component here ...</h1> -->
     <card-screen
-      v-for="(cards1, index) in cardsContext"
+      v-for="(card, index) in cardsContext"
       :key="index"
       :cardsContext="cardsContext"
-      :imgBackFaceUrl="`images/${cards1}.png`"
-      :TestCard="{ index, value: cards1 }"
-      :ref="`cards1-${index}`"
-      @onFlip="checkRule($event)"
+      :imgBackFaceUrl="`images/${card}.png`"
+      :testCard="{ index, value: card }"
+      ref="cards"
+      @onFlip="checkRule"
+      @onFlipBack="onFlipBackCard(index)"
     ></card-screen>
   </div>
 </template>
+
 <script>
 import CardScreen from "./TestCard.vue";
 export default {
@@ -35,41 +37,54 @@ export default {
     checkRule(card) {
       if (this.rules.length === 2) return false;
       this.rules.push(card);
-      if (
-        this.rules.length === 2 &&
-        this.rules[0].value !== this.rules[1].value
-      ) {
-        console.log("wrong!");
-        setTimeout(() => {
-          this.$refs[`card-${this.rules[0].index}`].onFlipBackCard();
-          this.$refs[`card-${this.rules[1].index}`].onFlipBackCard();
+      if (this.rules.length === 2) {
+        if (this.rules[0].value === this.rules[1].value) {
+          console.log("right");
+
+          //add class 'disable' to component card
+          this.$refs.cards[this.rules[0].index].onEnableDisableMode();
+          this.$refs.cards[this.rules[1].index].onEnableDisableMode();
           this.rules = [];
-        }, 800);
-      } else return false;
+        } else {
+          console.log("wrong!");
+          setTimeout(() => {
+            this.$refs.cards[this.rules[0].index].onFlipBackCard();
+            this.$refs.cards[this.rules[1].index].onFlipBackCard();
+            this.rules = [];
+          }, 800);
+        }
+      }
+    },
+    onFlipBackCard(index) {
+      setTimeout(() => {
+        this.$refs.cards[index].onFlipBackCard();
+      }, 800);
+    },
+    onEnableDisableMode(index) {
+      setTimeout(() => {
+        this.$refs.cards[index].onEnableDisableMode();
+      }, 800);
     },
   },
 };
-//   methods: {
-//     checkRule(card) {
-//       console.log(card);
-//       if (this.rules.length === 2) return false;
-//       this.rules.push(card);
-//       // console.log(this.rules);
-//       if (
-//         this.rules.length === 2 &&
-//         this.rules[0].value === this.rules[1].value
-//       ) {
-//         console.log("right");
-//       } else if (
-//         this.rules.length === 2 &&
-//         this.rules[0].value !== this.rules[1].value
-//       ) {
-//         console.log("wrong");
-
-//         this.$refs[`card-${this.rules[0].index}`].onFlipBackCard();
-//         this.rules = [];
-//       } else return false;
-//     },
-//   },
-// };
 </script>
+
+<style scoped>
+.screen {
+  width: 100%;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  background-color: var(--dark);
+  color: var(--light);
+}
+
+.screen__inner {
+  width: calc(424px);
+  display: flex;
+  flex-wrap: wrap;
+  margin: 2rem auto;
+}
+</style>
